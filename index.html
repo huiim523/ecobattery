@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>환경 보조배터리 · Environmental Power Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Noto+Serif+KR:wght@500;700;900&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a1812;
+    --bg-2:#0d2018;
+    --gold:#d8b85a;
+    --gold-bright:#f0d488;
+    --green:#7fbf63;
+    --ink:#f2efe2;
+    --muted:rgba(242,239,226,.55);
+    --line:rgba(216,184,90,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans KR",sans-serif;
+    overflow:hidden;
+    position:relative;
+  }
+  /* atmosphere */
+  .bg-glow{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(900px 700px at 78% 42%, rgba(216,184,90,.14), transparent 60%),
+      radial-gradient(700px 600px at 12% 88%, rgba(127,191,99,.08), transparent 55%),
+      linear-gradient(160deg,#0a1812 0%, #0d2018 55%, #081410 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55);}
+
+  .wrap{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
+    max-width:1280px;margin:0 auto;padding:0 clamp(22px,5vw,64px);}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;
+    padding:26px 0 0;}
+  .brand{display:flex;align-items:center;gap:12px;opacity:0;animation:fade .8s .1s forwards}
+  .brand .glyph{width:26px;height:32px;position:relative;flex:0 0 auto}
+  .brand .glyph svg{width:100%;height:100%}
+  .brand .name{line-height:1.05}
+  .brand .ko{font-family:"Noto Serif KR",serif;font-weight:700;font-size:16px;letter-spacing:.02em}
+  .brand .en{font-size:9.5px;letter-spacing:.34em;color:var(--gold);text-transform:uppercase;margin-top:2px}
+  .menu{display:flex;gap:34px;align-items:center;opacity:0;animation:fade .8s .25s forwards}
+  .menu a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:400;
+    letter-spacing:.02em;transition:color .3s;position:relative}
+  .menu a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1px;
+    background:var(--gold);transition:width .3s}
+  .menu a:hover{color:var(--ink)}
+  .menu a:hover::after{width:100%}
+  .menu .cta{color:var(--bg);background:var(--gold);padding:9px 18px;border-radius:999px;
+    font-weight:600;font-size:12.5px;letter-spacing:.04em}
+  .menu .cta::after{display:none}
+  .menu .cta:hover{background:var(--gold-bright);color:var(--bg)}
+  @media(max-width:760px){.menu a:not(.cta){display:none}}
+
+  /* hero */
+  .hero{flex:1;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:40px}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;gap:20px}}
+
+  .kicker{display:inline-flex;align-items:center;gap:10px;
+    border:1px solid var(--line);border-radius:999px;padding:7px 15px;
+    font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);
+    opacity:0;animation:rise .9s .4s forwards}
+  .kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 10px var(--green)}
+
+  h1{font-family:"Noto Serif KR",serif;font-weight:900;
+    font-size:clamp(38px,6.4vw,76px);line-height:1.08;letter-spacing:-.01em;margin:22px 0 0}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln span{display:block;transform:translateY(110%);opacity:0;
+    animation:lift .95s cubic-bezier(.2,.7,.2,1) forwards}
+  h1 .ln:nth-child(1) span{animation-delay:.5s}
+  h1 .ln:nth-child(2) span{animation-delay:.62s}
+  h1 .gold{color:var(--gold)}
+
+  .lead{margin-top:24px;max-width:40ch;font-size:clamp(14px,1.5vw,16.5px);
+    line-height:1.85;color:var(--muted);font-weight:300;
+    opacity:0;animation:rise 1s .85s forwards}
+  .lead b{color:var(--ink);font-weight:500}
+
+  .actions{margin-top:36px;display:flex;align-items:center;gap:22px;
+    opacity:0;animation:rise 1s 1s forwards}
+  .btn{background:var(--gold);color:var(--bg);text-decoration:none;
+    padding:14px 26px;border-radius:999px;font-weight:600;font-size:14px;
+    letter-spacing:.02em;transition:transform .3s, box-shadow .3s, background .3s;
+    box-shadow:0 10px 30px -10px rgba(216,184,90,.5)}
+  .btn:hover{transform:translateY(-2px);background:var(--gold-bright);
+    box-shadow:0 16px 40px -12px rgba(216,184,90,.7)}
+  .ghost{color:var(--ink);text-decoration:none;font-size:14px;font-weight:400;
+    display:inline-flex;align-items:center;gap:8px;letter-spacing:.02em}
+  .ghost .ar{transition:transform .3s}
+  .ghost:hover .ar{transform:translateX(5px)}
+
+  /* battery visual */
+  .visual{position:relative;display:flex;justify-content:center;align-items:center;
+    opacity:0;animation:fade 1.2s .55s forwards}
+  .visual .halo{position:absolute;width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(216,184,90,.22),transparent 65%);
+    filter:blur(8px);animation:breathe 5.5s ease-in-out infinite}
+  .batt{width:clamp(150px,20vw,220px);height:auto;position:relative;z-index:1;
+    animation:float 6s ease-in-out infinite}
+  .batt .cell{fill:none;stroke:var(--gold);stroke-width:5;opacity:.9}
+  .batt .cap{fill:var(--gold);opacity:.9}
+  .batt .seg{fill:var(--gold);opacity:0}
+  .batt .seg.s1{animation:charge .6s 1.6s forwards}
+  .batt .seg.s2{animation:charge .6s 2.1s forwards}
+  .batt .seg.s3{animation:charge .6s 2.6s forwards}
+  .batt .bolt{fill:var(--bg);opacity:0;animation:fade .6s 2.9s forwards}
+  .batt .node{fill:var(--gold)}
+  .batt .wire{stroke:var(--line);stroke-width:2;stroke-dasharray:4 5}
+
+  /* footer strip */
+  .strip{display:flex;align-items:center;justify-content:space-between;gap:18px;
+    padding:20px 0 30px;border-top:1px solid rgba(255,255,255,.06);
+    opacity:0;animation:fade 1s 1.25s forwards;flex-wrap:wrap}
+  .pills{display:flex;gap:26px;flex-wrap:wrap}
+  .pill{display:flex;align-items:baseline;gap:9px;font-size:12.5px;color:var(--muted)}
+  .pill i{font-style:normal;color:var(--gold);font-family:"Fraunces",serif;font-size:13px;
+    font-weight:600}
+  .pill b{color:var(--ink);font-weight:500}
+  .for{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .for span{color:var(--gold)}
+  @media(max-width:620px){.pills{display:none}}
+
+  @keyframes fade{to{opacity:1}}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes lift{to{transform:translateY(0);opacity:1}}
+  @keyframes charge{to{opacity:.92}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important}}
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <div class="wrap">
+    <nav>
+      <div class="brand">
+        <div class="glyph">
+          <svg viewBox="0 0 26 32" fill="none">
+            <rect x="8" y="1" width="10" height="3" rx="1" fill="#d8b85a"/>
+            <rect x="3" y="5" width="20" height="26" rx="3" stroke="#d8b85a" stroke-width="2.5"/>
+            <path d="M14.5 9 L8.5 19 H12.5 L11 27 L18 16 H13.5 Z" fill="#d8b85a"/>
+          </svg>
+        </div>
+        <div class="name">
+          <div class="ko">환경 보조배터리</div>
+          <div class="en">Environmental Power Bank</div>
+        </div>
+      </div>
+      <div class="menu">
+        <a href="#">회사소개</a>
+        <a href="#">핵심기술</a>
+        <a href="#">사업영역</a>
+        <a href="#">실적</a>
+        <a href="#" class="cta">문의하기</a>
+      </div>
+    </nav>
+
+    <main class="hero">
+      <div class="copy">
+        <span class="kicker"><span class="dot"></span>IoT × Ecosystem × Incheon</span>
+        <h1>
+          <span class="ln"><span>스스로 천이할 수 없는</span></span>
+          <span class="ln"><span><em class="gold" style="font-style:normal">매립지 생태계</em>에,</span></span>
+        </h1>
+        <p class="lead">
+          충전기처럼 100% 자연 천이는 불가능하더라도, 우리는 매립지 생태계에
+          <b>IoT라는 생명선</b>을 연결합니다. 감지·정화·예측을 잇는
+          <b>환경 보조배터리</b>가 매립지의 생명력을 연장합니다.
+        </p>
+        <div class="actions">
+          <a href="#" class="btn">솔루션 살펴보기</a>
+          <a href="#" class="ghost">제안서 다운로드 <span class="ar">→</span></a>
+        </div>
+      </div>
+
+      <div class="visual">
+        <div class="halo"></div>
+        <svg class="batt" viewBox="0 0 200 260" fill="none">
+          <!-- connection wires + nodes -->
+          <line class="wire" x1="0" y1="130" x2="48" y2="130"/>
+          <line class="wire" x1="152" y1="130" x2="200" y2="130"/>
+          <circle class="node" cx="6" cy="130" r="4"/>
+          <circle class="node" cx="194" cy="130" r="4"/>
+          <!-- battery body -->
+          <rect class="cap" x="78" y="6" width="44" height="14" rx="3"/>
+          <rect class="cell" x="48" y="22" width="104" height="216" rx="14"/>
+          <!-- charge segments -->
+          <rect class="seg s1" x="62" y="162" width="76" height="58" rx="6"/>
+          <rect class="seg s2" x="62" y="96"  width="76" height="58" rx="6"/>
+          <rect class="seg s3" x="62" y="30"  width="76" height="58" rx="6"/>
+          <!-- lightning bolt -->
+          <path class="bolt" d="M112 60 L74 142 H100 L88 200 L132 118 H102 Z"/>
+        </svg>
+      </div>
+    </main>
+
+    <footer class="strip">
+      <div class="pills">
+        <div class="pill"><i>01</i><b>지반-데이터 연결</b> 압전·불포화대 감지</div>
+        <div class="pill"><i>02</i><b>생태 능동 정화</b> 스마트 바이오스웨일</div>
+        <div class="pill"><i>03</i><b>예방적 통합관제</b> 디지털 트윈</div>
+      </div>
+      <div class="for">For <span>인천광역시</span> · 매립지 환경 모니터링</div>
+    </footer>
+  </div>
+</body>
+</html>
